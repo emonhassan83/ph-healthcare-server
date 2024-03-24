@@ -2,21 +2,43 @@ import { NextFunction, Request, Response } from "express";
 import { userService } from "./user.service";
 import sendResponse from "../../../shared/sendResponse";
 import httpStatus from "http-status";
+import catchAsync from "../../../shared/catchAsync";
 
-const createAdmin = async (req: Request, res: Response, next: NextFunction) => {
-   try {    
+const createAdmin = catchAsync(async (req: Request, res: Response) => {
+
     const result = await userService.createAdmin(req);
     sendResponse(res, {
         statusCode: httpStatus.OK,
         success: true,
-        message: "Admin created successfully!",
+        message: "Admin Created successfuly!",
         data: result
-    });
-   } catch (err) {
-    next(err)
-}
-}
+    })
+});
+
+const createDoctor = catchAsync(async (req: Request, res: Response) => {
+
+    const result = await userService.createDoctor(req);
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: "Doctor Created successfully!",
+        data: result
+    })
+});
+
+const createPatient = catchAsync(async (req: Request, res: Response) => {
+
+    const result = await userService.createPatient(req);
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: "Patient Created successfully!",
+        data: result
+    })
+});
 
 export const userController = {
-    createAdmin
+    createAdmin,
+    createDoctor,
+    createPatient,
 };
