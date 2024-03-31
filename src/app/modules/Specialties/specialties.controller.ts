@@ -5,7 +5,6 @@ import { Request, Response } from "express";
 import { SpecialtiesService } from "./specialties.service";
 
 const createSpecialties = catchAsync(async (req: Request, res: Response) => {
-    console.log(req.body)
     const result = await SpecialtiesService.insertIntoDB(req);
 
     sendResponse(res, {
@@ -16,6 +15,29 @@ const createSpecialties = catchAsync(async (req: Request, res: Response) => {
     });
 });
 
+const getAllSpecialties = catchAsync(async (req: Request, res: Response) => {
+  const result = await SpecialtiesService.getAllFromDB();
+  sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: 'Specialties data fetched successfully',
+      data: result,
+  });
+});
+
+const deleteSpecialties = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const result = await SpecialtiesService.deleteFromDB(id);
+  sendResponse(res, {
+      statusCode: httpStatus.OK,
+      success: true,
+      message: 'Specialty deleted successfully',
+      data: result,
+  });
+});
+
 export const SpecialtiesController = {
-  createSpecialties
+  createSpecialties,
+  getAllSpecialties,
+  deleteSpecialties,
 };
