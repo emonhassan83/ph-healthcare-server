@@ -25,6 +25,7 @@ const getAllFromDB = async (
         });
     }
 
+    //* doctor -> doctorSpecialties -> specialities -> title
     if (specialties && specialties.length > 0) {
         // Corrected specialties condition
         andConditions.push({
