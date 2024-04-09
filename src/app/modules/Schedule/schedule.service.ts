@@ -169,6 +169,7 @@ const getByIdFromDB = async (id: string): Promise<Schedule | null> => {
       id,
     },
   });
+  
   return result;
 };
 
