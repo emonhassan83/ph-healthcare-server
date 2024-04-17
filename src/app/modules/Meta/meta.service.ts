@@ -16,7 +16,7 @@ const fetchDashboardMetaData = async (user: IAuthUser) => {
       metaData = getDoctorMetaData(user);
       break;
     case UserRole.PATIENT:
-      metaData = getPatientMetaData();
+      metaData = getPatientMetaData(user);
       break;
     default:
       throw new Error("Invalid user role!");
@@ -26,7 +26,27 @@ const fetchDashboardMetaData = async (user: IAuthUser) => {
 };
 
 const getSuperAdminMetaData = async () => {
-  console.log("super admin meta data");
+  const appointmentCount = await prisma.appointment.count();
+  const patientCount = await prisma.patient.count();
+  const doctorCount = await prisma.doctor.count();
+  const adminCount = await prisma.admin.count();
+  const paymentCount = await prisma.payment.count();
+
+  const totalRevenue = await prisma.payment.aggregate({
+    _sum: { amount: true },
+    where: {
+      status: PaymentStatus.PAID,
+    },
+  });
+
+  return {
+    appointmentCount,
+    patientCount,
+    doctorCount,
+    adminCount,
+    paymentCount,
+    totalRevenue,
+  };
 };
 
 const getAdminMetaData = async () => {
@@ -112,8 +132,51 @@ const getDoctorMetaData = async (user: IAuthUser) => {
   };
 };
 
-const getPatientMetaData = async () => {
-  console.log("patient meta data");
+const getPatientMetaData = async (user: IAuthUser) => {
+  const patientData = await prisma.patient.findUniqueOrThrow({
+    where: {
+      email: user?.email,
+    },
+  });
+
+  const appointmentCount = await prisma.appointment.count({
+    where: {
+      patientId: patientData.id,
+    },
+  });
+
+  const prescriptionCount = await prisma.prescription.count({
+    where: {
+      patientId: patientData.id,
+    },
+  });
+
+  const reviewCount = await prisma.review.count({
+    where: {
+      patientId: patientData.id,
+    },
+  });
+
+  const appointmentStatusDistribution = await prisma.appointment.groupBy({
+    by: ["status"],
+    _count: { id: true },
+    where: {
+      patientId: patientData.id,
+    },
+  });
+
+  const formattedAppointmentStatusDistribution =
+    appointmentStatusDistribution.map(({ status, _count }) => ({
+      status,
+      count: Number(_count.id),
+    }));
+
+  return {
+    appointmentCount,
+    prescriptionCount,
+    reviewCount,
+    formattedAppointmentStatusDistribution,
+  };
 };
 
 export const MetaService = {
