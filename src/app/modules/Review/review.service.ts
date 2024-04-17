@@ -110,7 +110,6 @@ const getAllFromDB = async (
   };
 };
 
-
 export const ReviewService = {
   insertIntoDB,
   getAllFromDB
