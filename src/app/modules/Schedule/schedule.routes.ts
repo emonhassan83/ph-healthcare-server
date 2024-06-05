@@ -13,7 +13,7 @@ router.post(
 
 router.get(
   '/',
-  auth(UserRole.DOCTOR),
+  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.DOCTOR),
   ScheduleController.getAllFromDB
 );
 
